@@ -1,2 +1,2 @@
 # plantserver
-a plantserver project.
+A plantserver project.
