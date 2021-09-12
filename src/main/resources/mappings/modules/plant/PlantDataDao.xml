@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.plant.dao.PlantDataDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="PlantData">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	
+	<select id="getRealTimeData" parameterType="String" resultType="PlantData">
+		
+		Select * From plant_data 
+		Where time = (Select max(time) 
+		From plant_data Where plant_data.device_id = #{deviceId})
+
+	</select>
+	
+	<select id="getUnusualHightTime" resultType="String">
+		SELECT count(*) FROM plant_data d
+		WHERE d.device_id = #{deviceId}
+		<if test="type=='soilH'">
+			AND d.soil_h &gt; 600
+		</if>
+		<if test="type=='soilT'">
+			AND d.soil_t &gt; 30
+		</if>
+		<if test="type=='enviH'">
+			AND d.envi_h &gt; 90
+		</if>
+		<if test="type=='enviT'">
+			AND d.envi_t &gt; 35
+		</if>
+		<if test="type=='enviL'">
+			AND d.envi_l &gt; 8000
+		</if>
+		AND d.time>=(NOW() - interval 24 hour)
+	</select>
+	
+	<select id="getUnusualLowTime" resultType="String">
+		SELECT count(*) FROM plant_data d
+		WHERE d.device_id = #{deviceId}
+		<if test="type=='soilH'">
+			AND d.soil_h &lt; 200
+		</if>
+		<if test="type=='soilT'">
+			AND d.soil_t &lt; 20
+		</if>
+		<if test="type=='enviH'">
+			AND d.envi_h &lt; 30
+		</if>
+		<if test="type=='enviT'">
+			AND d.envi_t &lt; 15
+		</if>
+		<if test="type=='enviL'">
+			AND d.envi_l &lt; 30
+		</if>
+		AND d.time>=(NOW() - interval 24 hour)
+	</select>
+</mapper>
